@@ -38,28 +38,30 @@ def bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_
 
 
 
-def permutation_test(adata, group1, group2, cell_type_col='cell_type', nperm=10000, alpha=0.05, verbose=False):
+def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, verbose=False):
     """
     Perform a permutation test to evaluate the differences in cell type proportions between two groups.
     Calculates p-values, adjusted p-values, and bootstrapped confidence intervals for the observed
-    log2 fold differences in proportions for each cell type.
-
+    log2 fold differences in proportions for each cell type. The log2 fold difference is calculated
+    as log2(prop_group1 / prop_group2), where group1 serves as the reference group.
+    
     Parameters:
         adata (AnnData): Annotated data matrix containing cell data.
-        group1 (str): Name of the first group to compare.
-        group2 (str): Name of the second group to compare.
+        group1 (str): Name of the reference group (numerator in the log2 fold difference calculation).
+        group2 (str): Name of the group to be compared against the reference group (denominator in the log2 fold difference calculation).
+        group_col (str, optional): Column name in adata.obs containing group labels. Default is 'group'.
         cell_type_col (str, optional): Column name in adata.obs containing cell type labels. Default is 'cell_type'.
         nperm (int, optional): Number of permutation iterations. Default is 10000.
         alpha (float, optional): Significance level for the confidence interval. Default is 0.05.
         verbose (bool, optional): If True, displays a progress bar. Default is False.
-
+    
     Returns:
         pd.DataFrame: DataFrame containing the results, including cell type, p-value, adjusted p-value,
                       observed log2 fold difference, and lower and upper bounds of the bootstrapped confidence interval.
     """
     
-    cells_group1 = adata.obs_names[adata.obs['group'] == group1].tolist()
-    cells_group2 = adata.obs_names[adata.obs['group'] == group2].tolist()
+    cells_group1 = adata.obs_names[adata.obs[group_col] == group1].tolist()
+    cells_group2 = adata.obs_names[adata.obs[group_col] == group2].tolist()
     all_cells = cells_group1 + cells_group2
 
     cell_types = adata.obs[cell_type_col].unique()
