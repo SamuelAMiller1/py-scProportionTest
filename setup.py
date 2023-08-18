@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
+from scProportionTest import __version__
 
 setup(
     name='py-scProportionTest',
-    version='0.1.1',
+    version=__version__,
     url='https://github.com/SamuelAMiller1/py-scProportionTest',
     author='Sam Miller',
     packages=find_packages(),    
