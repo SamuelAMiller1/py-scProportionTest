@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='py-scProportionTest',
-    version='0.1.0',
+    version='0.1.1',
     url='https://github.com/SamuelAMiller1/py-scProportionTest',
     author='Sam Miller',
     packages=find_packages(),    
