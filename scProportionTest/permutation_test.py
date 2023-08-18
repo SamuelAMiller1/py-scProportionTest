@@ -38,7 +38,7 @@ def bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_
 
 
 
-def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, verbose=False):
+def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, n_bootstrap=10000, verbose=True):
     """
     Perform a permutation test to evaluate the differences in cell type proportions between two groups.
     Calculates p-values, adjusted p-values, and bootstrapped confidence intervals for the observed
@@ -53,7 +53,8 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         cell_type_col (str, optional): Column name in adata.obs containing cell type labels. Default is 'cell_type'.
         nperm (int, optional): Number of permutation iterations. Default is 10000.
         alpha (float, optional): Significance level for the confidence interval. Default is 0.05.
-        verbose (bool, optional): If True, displays a progress bar. Default is False.
+        n_bootstrap (int, optional): Number of bootstrap iterations. Default is 10000.
+        verbose (bool, optional): If True, displays a progress bar. Default is True.
     
     Returns:
         pd.DataFrame: DataFrame containing the results, including cell type, p-value, adjusted p-value,
@@ -76,7 +77,7 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         observed_diffs[cell_type] = np.log2(prop_group1 / prop_group2) if prop_group2 > 0 else np.nan
 
         # Calculate bootstrapped confidence interval
-        lower_ci, upper_ci = bootstrap_ci(adata, cells_group1, cells_group2, cell_type_col, cell_type)
+        lower_ci, upper_ci = bootstrap_ci(adata, cells_group1, cells_group2, cell_type_col, cell_type, n_bootstrap, alpha)
         bootstrapped_cis[cell_type] = (lower_ci, upper_ci)
 
         # Perform the permutations
