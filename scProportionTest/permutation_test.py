@@ -31,7 +31,7 @@ def bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_
         prop_group1 = (adata.obs.loc[bootstrap_group1_cells, cell_type_col] == cell_type).mean()
         prop_group2 = (adata.obs.loc[bootstrap_group2_cells, cell_type_col] == cell_type).mean()
 
-        bootstrapped_diff = np.log2(prop_group1 / prop_group2) if prop_group2 > 0 else np.nan
+        bootstrapped_diff = np.log2(prop_group2 / prop_group1) if prop_group1 > 0 else np.nan
         bootstrapped_diffs.append(bootstrapped_diff)
 
     return np.nanpercentile(bootstrapped_diffs, [alpha / 2 * 100, (1 - alpha / 2) * 100])
@@ -47,8 +47,8 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
     
     Parameters:
         adata (AnnData): Annotated data matrix containing cell data.
-        group1 (str): Name of the reference group (numerator in the log2 fold difference calculation).
-        group2 (str): Name of the group to be compared against the reference group (denominator in the log2 fold difference calculation).
+        group1 (str): Name of the reference group (denominator in the log2 fold difference calculation).
+        group2 (str): Name of the group to be compared against the reference group (numerator in the log2 fold difference calculation).
         group_col (str, optional): Column name in adata.obs containing group labels. Default is 'group'.
         cell_type_col (str, optional): Column name in adata.obs containing cell type labels. Default is 'cell_type'.
         nperm (int, optional): Number of permutation iterations. Default is 10000.
@@ -74,7 +74,7 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
     for cell_type in tqdm(cell_types, desc="Processing cell types", disable=not verbose):
         prop_group1 = (adata.obs.loc[cells_group1, cell_type_col] == cell_type).mean()
         prop_group2 = (adata.obs.loc[cells_group2, cell_type_col] == cell_type).mean()
-        observed_diffs[cell_type] = np.log2(prop_group1 / prop_group2) if prop_group2 > 0 else np.nan
+        observed_diffs[cell_type] = np.log2(prop_group2 / prop_group1) if prop_group1 > 0 else np.nan
 
         # Calculate bootstrapped confidence interval
         lower_ci, upper_ci = bootstrap_ci(adata, cells_group1, cells_group2, cell_type_col, cell_type, n_bootstrap, alpha)
@@ -89,7 +89,7 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
 
             perm_prop_group1 = (adata.obs.loc[perm_group1, cell_type_col] == cell_type).mean()
             perm_prop_group2 = (adata.obs.loc[perm_group2, cell_type_col] == cell_type).mean()
-            perm_diff = np.log2(perm_prop_group1 / perm_prop_group2) if perm_prop_group2 > 0 else np.nan
+            perm_diff = np.log2(perm_prop_group2 / perm_prop_group1) if perm_prop_group1 > 0 else np.nan
             null_diffs.append(perm_diff)
 
         # Store null differences for this cell type
