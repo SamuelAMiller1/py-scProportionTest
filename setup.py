@@ -9,6 +9,6 @@ setup(
     packages=find_packages(),    
     install_requires=['numpy', 'pandas', 'statsmodels', 'matplotlib', 'tqdm'],
     description='Python package to evaluate differences in cell type proportions',
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown'
+    long_description=open('README.rst').read(),
+    long_description_content_type='text/reStructuredText'
 )
