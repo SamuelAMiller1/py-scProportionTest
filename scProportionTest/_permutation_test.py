@@ -52,7 +52,7 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         alpha (float, optional): Significance level for the confidence interval. Default is 0.05.
         n_bootstrap (int, optional): Number of bootstrap iterations. Default is 10000.
         verbose (bool, optional): If True, displays a progress bar. Default is True.
-        seed (int, optional): Seed for random number generator for reproducibility. Default is None.
+        seed (int, optional): Seed for random number generator for reproducibility. Default is 67.
     
     Returns:
         pd.DataFrame: DataFrame containing the results, including cell type, p-value, adjusted p-value,
