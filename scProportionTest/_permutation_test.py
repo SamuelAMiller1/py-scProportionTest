@@ -3,9 +3,7 @@ import pandas as pd
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
 
-
-
-def bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_bootstrap=10000, alpha=0.05):
+def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_bootstrap=10000, alpha=0.05):
     """
     Calculate the bootstrapped confidence intervals for the observed proportional difference 
     for a specific cell type between two groups.
@@ -77,7 +75,7 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         observed_diffs[cell_type] = np.log2(prop_group2 / prop_group1) if prop_group1 > 0 else np.nan
 
         # Calculate bootstrapped confidence interval
-        lower_ci, upper_ci = bootstrap_ci(adata, cells_group1, cells_group2, cell_type_col, cell_type, n_bootstrap, alpha)
+        lower_ci, upper_ci = _bootstrap_ci(adata, cells_group1, cells_group2, cell_type_col, cell_type, n_bootstrap, alpha)
         bootstrapped_cis[cell_type] = (lower_ci, upper_ci)
 
         # Perform the permutations
