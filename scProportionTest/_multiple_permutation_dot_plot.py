@@ -4,7 +4,6 @@ import matplotlib as mpl
 from matplotlib.colors import TwoSlopeNorm
 import seaborn as sns
 
-
 def multiple_permutation_dot_plot(results, 
                                   alpha_threshold=0.05, 
                                   observed_diff_threshold=0.58, 
