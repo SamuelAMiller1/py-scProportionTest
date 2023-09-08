@@ -20,6 +20,7 @@ def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n
     Returns:
     - tuple: Lower and upper bounds of the bootstrapped confidence interval.
     """
+    
     # Initializing a list to store bootstrapped differences
     bootstrapped_diffs = []
     for _ in range(n_bootstrap):
@@ -63,6 +64,7 @@ def _single_comparison(adata, group1, group2, group_col, cell_type_col, nperm, a
     Returns:
     - DataFrame: Contains observed differences, p-values, and confidence intervals for each cell type between the two groups.
     """
+    
     # Extracting cells associated with each group
     cells_group1 = adata.obs_names[adata.obs[group_col] == group1].tolist()
     cells_group2 = adata.obs_names[adata.obs[group_col] == group2].tolist()
@@ -142,7 +144,7 @@ def _single_comparison(adata, group1, group2, group_col, cell_type_col, nperm, a
     
     return results
 
-def multiple_permutation_test(adata, group1, group2_list, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, n_bootstrap=10000, p_adjust_method='fdr_bh'):
+def multiple_permutation_test(adata, group1, group2_list, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, n_bootstrap=10000, p_adjust_method='fdr_bh', seed=None):
     """
     Conduct permutation tests for multiple group comparisons in parallel.
 
@@ -156,10 +158,13 @@ def multiple_permutation_test(adata, group1, group2_list, group_col='group', cel
     - alpha: Significance level for confidence interval computation (default is 0.05).
     - n_bootstrap: Number of bootstrap iterations for confidence interval computation (default is 10000).
     - p_adjust_method: Method for multiple testing correction (default is 'fdr_bh').
+    - seed: Seed for reproducibility.
 
     Returns:
     - DataFrame: Consolidated results containing observed differences, p-values, adjusted p-values, and confidence intervals for each cell type across all comparisons.
     """
+    np.random.seed(seed)
+    
     # Checking for the presence of required columns in the AnnData object
     if group_col not in adata.obs.columns:
         raise ValueError(f"'{group_col}' not found in 'adata.obs'.")
