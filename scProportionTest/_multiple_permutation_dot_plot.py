@@ -107,6 +107,9 @@ def multiple_permutation_dot_plot(results,
         plt.grid(True, linestyle='--', alpha=0.5)
         plt.gca().set_axisbelow(True)
         
+        # Increase margins
+        ax.margins(0.15, 0.15)
+        
         plt.show()
     except Exception as e:
         raise RuntimeError(f"An error occurred while plotting: {str(e)}")
