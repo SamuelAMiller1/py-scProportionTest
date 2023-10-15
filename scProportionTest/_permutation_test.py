@@ -3,7 +3,7 @@ import pandas as pd
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm
 
-def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_bootstrap=10000, alpha=0.05):
+def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_bootstrap=1000, alpha=0.05):
     """
     Calculate the bootstrapped confidence intervals for the observed proportional difference 
     for a specific cell type between two groups.
@@ -14,7 +14,7 @@ def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n
         group2_cells (list): List of cell names or indices for group 2.
         cell_type_col (str): Column name in adata.obs containing cell type labels.
         cell_type (str): Specific cell type for which to calculate the confidence interval.
-        n_bootstrap (int, optional): Number of bootstrap iterations. Default is 10000.
+        n_bootstrap (int, optional): Number of bootstrap iterations. Default is 1000.
         alpha (float, optional): Significance level for the confidence interval. Default is 0.05.
 
     Returns:
@@ -35,7 +35,7 @@ def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n
     return np.nanpercentile(bootstrapped_diffs, [alpha / 2 * 100, (1 - alpha / 2) * 100])
 
 
-def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, n_bootstrap=10000, verbose=True, seed=67):
+def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=1000, alpha=0.05, n_bootstrap=1000, verbose=True, seed=67):
     """
     Perform a permutation test to evaluate the differences in cell type proportions between two groups.
     Calculates p-values, adjusted p-values, and bootstrapped confidence intervals for the observed
@@ -48,9 +48,9 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         group2 (str): Name of the group to be compared against the reference group (numerator in the log2 fold difference calculation).
         group_col (str, optional): Column name in adata.obs containing group labels. Default is 'group'.
         cell_type_col (str, optional): Column name in adata.obs containing cell type labels. Default is 'cell_type'.
-        nperm (int, optional): Number of permutation iterations. Default is 10000.
+        nperm (int, optional): Number of permutation iterations. Default is 1000.
         alpha (float, optional): Significance level for the confidence interval. Default is 0.05.
-        n_bootstrap (int, optional): Number of bootstrap iterations. Default is 10000.
+        n_bootstrap (int, optional): Number of bootstrap iterations. Default is 1000.
         verbose (bool, optional): If True, displays a progress bar. Default is True.
         seed (int, optional): Seed for random number generator for reproducibility. Default is 67.
     
@@ -112,6 +112,6 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
     })
 
     # Adjust the p-values using Benjamini-Hochberg procedure
-    results['adj_p_value'] = multipletests(results['p_value'], method='fdr_bh')[1]
+    results['adj_p_value'] = multipletests(results['p_value'], method='bonferroni')[1]
 
     return results
