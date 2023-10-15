@@ -4,7 +4,7 @@ import os
 from statsmodels.stats.multitest import multipletests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_bootstrap=10000, alpha=0.05):
+def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n_bootstrap=1000, alpha=0.05):
     """
     Compute the bootstrapped confidence interval for the log2 proportion difference between two groups of cells.
 
@@ -14,7 +14,7 @@ def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n
     - group2_cells: List of cell identifiers belonging to group 2.
     - cell_type_col: Column name in `adata.obs` containing cell type information.
     - cell_type: Specific cell type for which confidence interval should be computed.
-    - n_bootstrap: Number of bootstrap iterations (default is 10000).
+    - n_bootstrap: Number of bootstrap iterations (default is 1000).
     - alpha: Significance level for confidence interval computation (default is 0.05).
 
     Returns:
@@ -34,11 +34,9 @@ def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n
 
         # Handling cases where proportions are zero to avoid NaN values
         if prop_group1 == 0 and prop_group2 == 0:
-            bootstrapped_diff = 0
-        elif prop_group1 == 0:
-            bootstrapped_diff = np.inf
-        elif prop_group2 == 0:
-            bootstrapped_diff = -np.inf
+            bootstrapped_diff = np.nan
+        elif prop_group1 == 0 or prop_group2 == 0:
+            bootstrapped_diff = np.nan
         else:
             bootstrapped_diff = np.log2(prop_group2 / prop_group1)
         
@@ -86,11 +84,9 @@ def _single_comparison(adata, group1, group2, group_col, cell_type_col, nperm, a
 
         # Handling cases where proportions are zero to avoid NaN values
         if prop_group1 == 0 and prop_group2 == 0:
-            observed_diff = 0
-        elif prop_group1 == 0:
-            observed_diff = np.inf
-        elif prop_group2 == 0:
-            observed_diff = -np.inf
+            observed_diff = np.nan  # changed from 0
+        elif prop_group1 == 0 or prop_group2 == 0:  # changed condition to OR
+            observed_diff = np.nan  # changed from np.inf and -np.inf
         else:
             observed_diff = np.log2(prop_group2 / prop_group1)
 
@@ -113,15 +109,14 @@ def _single_comparison(adata, group1, group2, group_col, cell_type_col, nperm, a
 
             # Handling cases where proportions are zero to avoid NaN values
             if perm_prop_group1 == 0 and perm_prop_group2 == 0:
-                perm_diff = 0
-            elif perm_prop_group1 == 0:
-                perm_diff = np.inf
-            elif perm_prop_group2 == 0:
-                perm_diff = -np.inf
+                perm_diff = np.nan
+            elif perm_prop_group1 == 0 or perm_prop_group2 == 0:
+                perm_diff = np.nan
             else:
                 perm_diff = np.log2(perm_prop_group2 / perm_prop_group1)
 
             null_diffs.append(perm_diff)
+            
         null_diffs_collection[cell_type] = null_diffs
 
     # Computing permutation-based p-values
@@ -144,7 +139,7 @@ def _single_comparison(adata, group1, group2, group_col, cell_type_col, nperm, a
     
     return results
 
-def multiple_permutation_test(adata, group1, group2_list, group_col='group', cell_type_col='cell_type', nperm=10000, alpha=0.05, n_bootstrap=10000, p_adjust_method='fdr_bh', seed=None):
+def multiple_permutation_test(adata, group1, group2_list, group_col='group', cell_type_col='cell_type', nperm=1000, alpha=0.05, n_bootstrap=1000, p_adjust_method='bonferroni', seed=None):
     """
     Conduct permutation tests for multiple group comparisons in parallel.
 
@@ -154,10 +149,10 @@ def multiple_permutation_test(adata, group1, group2_list, group_col='group', cel
     - group2_list: List of group names to be compared against `group1`.
     - group_col: Column name in `adata.obs` containing group information (default is 'group').
     - cell_type_col: Column name in `adata.obs` containing cell type information (default is 'cell_type').
-    - nperm: Number of permutations for p-value computation (default is 10000).
+    - nperm: Number of permutations for p-value computation (default is 1000).
     - alpha: Significance level for confidence interval computation (default is 0.05).
-    - n_bootstrap: Number of bootstrap iterations for confidence interval computation (default is 10000).
-    - p_adjust_method: Method for multiple testing correction (default is 'fdr_bh').
+    - n_bootstrap: Number of bootstrap iterations for confidence interval computation (default is 1000).
+    - p_adjust_method: Method for multiple testing correction (default is 'bonferroni').
     - seed: Seed for reproducibility.
 
     Returns:
@@ -174,7 +169,12 @@ def multiple_permutation_test(adata, group1, group2_list, group_col='group', cel
         raise ValueError("'group2_list' should be of type list.")
 
     # Determining the number of available CPUs for parallel processing
-    num_cpus = os.cpu_count()
+    tot_cpus = os.cpu_count()
+    if tot_cpus > 1:
+        num_cpus = tot_cpus - 1
+    else:
+        num_cpus = 1
+    
     print(f"Using {num_cpus} CPUs for parallel processing.")
 
     all_results = []
