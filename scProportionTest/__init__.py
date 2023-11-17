@@ -1,5 +1,5 @@
 #current package version
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 #package imports
 from ._permutation_test import permutation_test
