@@ -1,6 +1,9 @@
-.. image:: https://raw.githubusercontent.com/SamuelAMiller1/py-scProportionTest/main/images/img_lightmode.png
-   :alt: Image
-   :width: 100px
+.. raw:: html
+
+   <picture>
+       <source srcset="https://raw.githubusercontent.com/SamuelAMiller1/py-scProportionTest/main/images/img_darkmode.png" media="(prefers-color-scheme: dark)">
+       <img src="https://raw.githubusercontent.com/SamuelAMiller1/py-scProportionTest/main/images/img_lightmode.png" alt="Image" style="width: 100px;">
+   </picture>
 
 **Single Cell Proportion Test in Python** is designed to analyze the difference between the proportion of cells in clusters between two scRNA-seq samples. A permutation test is used to calculate a p-value for each cluster, and a confidence interval for the magnitude difference is returned via bootstrapping. Results can be visualized using a point range plot. View the `tutorial <https://github.com/SamuelAMiller1/py-scProportionTest/blob/main/tutorials/scPropTest_tutorial.ipynb>`_ to get started. If you are working with an Seurat object, you may consider the `implementation in R <https://github.com/rpolicastro/scProportionTest/tree/master>`_.
 
