@@ -35,12 +35,12 @@ def _bootstrap_ci(adata, group1_cells, group2_cells, cell_type_col, cell_type, n
     return np.nanpercentile(bootstrapped_diffs, [alpha / 2 * 100, (1 - alpha / 2) * 100])
 
 
-def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=1000, alpha=0.05, n_bootstrap=1000, verbose=True, seed=67):
+def permutation_test(adata, group1, group2, group_col='group', cell_type_col='cell_type', nperm=1000, alpha=0.05, n_bootstrap=1000, verbose=True, seed=67, method='bonferroni'):
     """
     Perform a permutation test to evaluate the differences in cell type proportions between two groups.
     Calculates p-values, adjusted p-values, and bootstrapped confidence intervals for the observed
     log2 fold differences in proportions for each cell type. The log2 fold difference is calculated
-    as log2(prop_group1 / prop_group2), where group1 serves as the reference group.
+    as log2(prop_group2 / prop_group1), where group1 serves as the reference group.
 
     Parameters:
         adata (AnnData): Annotated data matrix containing cell data.
@@ -53,6 +53,8 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         n_bootstrap (int, optional): Number of bootstrap iterations. Default is 1000.
         verbose (bool, optional): If True, displays a progress bar. Default is True.
         seed (int, optional): Seed for random number generator for reproducibility. Default is 67.
+        method (str, optional): Method for multiple testing correction. Default is 'bonferroni'.
+
     
     Returns:
         pd.DataFrame: DataFrame containing the results, including cell type, p-value, adjusted p-value,
@@ -111,7 +113,7 @@ def permutation_test(adata, group1, group2, group_col='group', cell_type_col='ce
         'upper_ci': [bootstrapped_cis[cell_type][1] for cell_type in p_values.keys()],
     })
 
-    # Adjust the p-values using Benjamini-Hochberg procedure
-    results['adj_p_value'] = multipletests(results['p_value'], method='bonferroni')[1]
+    # Adjust the p-values using the specified method
+    results['adj_p_value'] = multipletests(results['p_value'], method=method)[1]
 
     return results
