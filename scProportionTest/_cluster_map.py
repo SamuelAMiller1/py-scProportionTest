@@ -74,4 +74,7 @@ def cluster_map(results,
     # Add title to the colorbar
     g.cax.set_title("Observed log2(FD)", pad=15)
 
+    #return object
+    return g
+
     plt.show()
