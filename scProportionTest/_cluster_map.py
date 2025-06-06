@@ -7,8 +7,8 @@ def cluster_map(results,
                 data_values='observed_diff', 
                 pvalue_values='adj_p_value',
                 cluster_on='both', 
-                asterix_size=10, 
-                asterix_color='black', 
+                asterisk_size=10,
+                asterisk_color='black',
                 alpha_threshold=0.05, 
                 cluster_method='average', 
                 cluster_metric='euclidean'):
@@ -22,8 +22,8 @@ def cluster_map(results,
     - data_values (str, optional): Values column for the data_matrix pivot operation. Default is 'observed_diff'.
     - pvalue_values (str, optional): Values column for the pvalue_matrix pivot operation. Default is 'adj_p_value'.
     - cluster_on: Axis on which to perform clustering. Options are 'both', 'y', or 'x'.
-    - asterix_size: Size of the asterisk font.
-    - asterix_color: Color of the asterisk.
+    - asterisk_size: Size of the asterisk font.
+    - asterisk_color: Color of the asterisk.
     - alpha_threshold: Threshold for significance for the adjusted p-value.
     - cluster_method (str, optional): Linkage algorithm to use for clustering. 
         Options['single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward'].
@@ -66,7 +66,7 @@ def cluster_map(results,
                        cbar_pos=(0.05, 0.8, 0.05, 0.18),
                        row_cluster=row_cluster,
                        col_cluster=col_cluster,
-                       annot_kws={"size": asterix_size, "color": asterix_color})
+                       annot_kws={"size": asterisk_size, "color": asterisk_color})
     
     # Rotate the y-axis labels to print horizontally
     plt.setp(g.ax_heatmap.get_yticklabels(), rotation=0)
